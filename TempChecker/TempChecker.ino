@@ -1,5 +1,4 @@
 /* TempChecker.cpp
- * Last Edited 1/10/2015
  * Wayne Xun and Gregory Leung
  * Email at WayneXun2017@u.northwestern.edu and GregoryLeung2016@u.northwestern.edu
  */
