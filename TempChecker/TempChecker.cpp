@@ -1,6 +1,6 @@
 /* TempChecker.cpp
- * Wayne Xun and Gregory Leung
- * Email at WayneXun2017@u.northwestern.edu and GregoryLeung2016@u.northwestern.edu
+ * Wayne Xun
+ * Email at WayneXun2017@u.northwestern.edu
  */
 
 #include "Constants.h"
@@ -11,14 +11,15 @@
  *  GLOBAL VARIABLES       *************************************
  */
 
-//global, holds the statuses of the temperatures of the batteries
-bool batteryTemperatureStatuses[NUM_BATTERIES];
+//global, holds information from the ADC
+unsigned int voltage = 0;
+unsigned double current = 0;
 
 //global timers used to hold millisecond timers
-unsigned long timeElapsed = 0;
-unsigned long timeNow = 0;
 unsigned long timeOfLastTemperatureCheck = 0;
-unsigned long timeSinceLastTemperatureCheck = 0;
+unsigned long timeNow = 0;
+unsigned long timeSinceCheck = 0;
+unsigned long timeToDelay = 0;
 
 /*
  *  HELPER FUNCTIONS       *************************************
@@ -28,7 +29,7 @@ unsigned long timeSinceLastTemperatureCheck = 0;
 void setupSPI();
 void writeBatteryErrors();
 bool checkBatteryErrors()
-bool temperatureCheckLoop();
+int temperatureCheckLoop();
 
 
 /*
@@ -39,81 +40,67 @@ void setupSPI()
 	// Initialize the bus for the device on pin ARDUINO_TEMP_PIN
 	SPI.begin(ARDUINO_TEMP_PIN);
 	// Set the clock divider on that pin to ARDUINO_SYSTEM_CLOCK_DIVIDER 
-	SPI.setClockDivider(ARDUINO_TEMP_PIN, ARDUINO_SYSTEM_CLOCK_DIVIDER);
+	// SPI.setClockDivider(ARDUINO_TEMP_PIN, SPI_CLOCK_DIV4); // 4 is default
         // Set order for bits to be read
-        setBitOrder(ARDUINO_BIT_ORDER);
+        setBitOrder(MSBFIRST);
         // Set data mode
-        setDataMode(ARDUINO_DATA_MODE);
+        setDataMode(SPI_MODE0);
+		
+		// send synchronization command here
+}
+/*
+* Sends request through SPI for voltage
+*/
+int getVoltage(int selection)
+{
+	// if selection = 1, elseif selection = 2
+	// send spi request
+	// send 4 bytes full of zeros
+	// store into voltage
+	// return voltage
 }
 
-/*  Writes into boolean array @param batteryTemperatureStatuses[]
- *  Each element of the array corresponds to a single temp. sensor.
- *  Each boolean in the array is 0 for not overheated
- *  or 1 for overheated.
- */
-void writeBatteryErrors ()
+double getCurrent(double voltage)
 {
-	for(int i = 0; i < NUM_BATTERIES; i++)
-	{
-		unsigned char SPIResponse = SPI.transfer(ARDUINO_TEMP_PIN, i);        // some command here to ADC
-		if (SPIResponse == BATTERY_TEMP_STATUS_OVERHEAT)
-		{
-			batteryTemperatureStatuses[i] = BATTERY_TEMP_STATUS_OVERHEAT;
-		}
-		else
-		{
-			batteryTemperatureStatuses[i] = BATTERY_TEMP_STATUS_OKAY;
-		}
-	}
-	return;
+	// with user defined voltage min, max, and bit positions
+	// double current = int * (max - min)/(2^senseBits) + min;
+	// return current
 }
 
-/*  Check boolean array batteryTemperatureStatuses[]
- *  for any true (1) elements. Returns 1 if
- *  there exists any true elements, 0 if none
+/* Delays loop dynamically to allow code to run at next user set frequency
  */
-bool checkBatteryErrors()
-{
-    for(int i = 0; i < NUM_BATTERIES; i++){
-        if (batteryTemperatureStatuses[i]){
-            return 1
-        }
-    }
-    return 0
-}
-
-/* runs writeBatteryErrors if enough time has elapsed since the last battery check
- * @return 0 if not enough time has passed, 1 if successfully written
- */
-bool temperatureCheckLoop ()
-{
+void delayLoop()
+{	
   	timeNow = millis();
-	timeElapsed = timeNow - timeOfLastTemperatureCheck;
+	timeSinceCheck = timeNow - timeOfLastTemperatureCheck;
 
-	if (timeElapsed > WAIT_TIME_MILLISECONDS)
+	if (timeSinceCheck > WAIT_TIME_MILLISECONDS)
 	{
-		writeBatteryErrors();
-		timeOfLastTemperatureCheck = millis();
-		timeElapsed = 0ul;
-		return 1;
+		timeToDelay = WAIT_TIME_MILLISECONDS - timeSinceCheck;
 	}
 	else
 	{
-		return 0;
+		timeToDelay = 0;
 	}
+
+	timeOfLastTemperatureCheck = timeNow + timeToDelay;
+	delay(timeToDelay);
 }
 
 /*
  *  MAIN FUNCTIONS       *************************************
  */
 void setup() {
-  void setupSPI();
+	setupSPI();		// set up and synchronize SPI
 }
 
 void loop() {
-    if (temperatureCheckLoop()){
-        checkBatteryErrors();
-    }
-    void writeBatteryErrors();
-    bool checkBatteryErrors();
+	if (selection == 1){ selection = 0 };			// alternate ADC to check
+	else if(){ selection = 1 };
+
+	voltage = getVoltage(selection);
+	current = getCurrent(voltage);
+	//send current through CAN packet
+
+	delayLoop();				// wait for next loop
 }

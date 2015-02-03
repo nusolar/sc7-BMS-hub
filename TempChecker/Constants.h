@@ -7,17 +7,15 @@
 
 /* Begin battery and temperature constants */
 
-#define NUM_BATTERIES                		32
-#define WAIT_TIME_MILLISECONDS			1000ul
-#define BATTERY_TEMP_STATUS_OVERHEAT 		true
-#define BATTERY_TEMP_STATUS_OKAY     		false
+#define NUM_BATTERIES                			32
+#define WAIT_TIME_MILLISECONDS					1000ul
+#define BATTERY_TEMP_STATUS_OVERHEAT 			true
+#define BATTERY_TEMP_STATUS_OKAY     			false
 
 /* Begin SPI constants */
 
-#define ARDUINO_TEMP_PIN		        4
-#define ARDUINO_SYSTEM_CLOCK_DIVIDER		21
-#define ARDUINO_BIT_ORDER                       LSB
-#define ARDUINO_DATA_MODE                       0
+#define ARDUINO_TEMP_PIN						4
+#define ARDUINO_SYSTEM_CLOCK_DIVIDER			21
 
 /* Begin ADC constants */
 #define ADC_POWER_DOWN                          10010'ARDUINO_TEMP_PIN'
