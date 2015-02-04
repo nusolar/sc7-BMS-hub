@@ -16,9 +16,5 @@
 
 #define ARDUINO_TEMP_PIN						4
 #define ARDUINO_SYSTEM_CLOCK_DIVIDER			21
-
-/* Begin ADC constants */
-#define ADC_POWER_DOWN                          10010'ARDUINO_TEMP_PIN'
-#define ADC_SHORT_ACQUISITION                   10000'ARDUINO_TEMP_PIN'
-#define ADC_LONG_ACQUISITION                    10011'ARDUINO_TEMP_PIN'
+#define ADC_SPI_PREFIX							0b10011000
 
