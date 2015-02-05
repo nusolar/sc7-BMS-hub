@@ -1,6 +1,8 @@
 /* TempChecker.cpp
  * Wayne Xun
  * Email at WayneXun2017@u.northwestern.edu
+ *
+ * For MAX1142ACAP/MAX1142BCAP ADC made by MAXIM	
  */
 
 #include "Constants.h"
