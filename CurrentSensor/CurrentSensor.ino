@@ -1,3 +1,17 @@
+/* Begin battery and temperature constants */
+
+#define NUM_BATTERIES                			32
+#define WAIT_TIME_MILLISECONDS				1000ul
+#define BATTERY_TEMP_STATUS_OVERHEAT 			true
+#define BATTERY_TEMP_STATUS_OKAY     			false
+
+/* Begin SPI constants */
+
+#define ARDUINO_TEMP_PIN				4
+#define ARDUINO_SYSTEM_CLOCK_DIVIDER			21
+#define ADC_SPI_PREFIX					0b10011000
+
+
 /* TempChecker.cpp
  * Wayne Xun
  * Email at WayneXun2017@u.northwestern.edu
@@ -5,7 +19,6 @@
  * For MAX1142ACAP/MAX1142BCAP ADC made by MAXIM	
  */
 
-#include "Constants.h"
 #include <SPI.h>
 
 
@@ -13,7 +26,7 @@
  *  GLOBAL VARIABLES       *************************************
  */
 int numOfPins = 1;						// number of pins to be checking
-int pinArray[numOfPins] = [4, 1];		// array containing pin numbers
+int pinArray[1] = {4};		                        // array containing pin numbers
 int selectPin = 0;						// pin to be looked at
 
 //global, holds information from the ADC
@@ -22,6 +35,7 @@ int maxVoltage = 12;
 int bitNum = 14;
 unsigned int voltageFirstByte = 0;
 unsigned int voltageSecondByte = 0;
+unsigned int voltage = 0;
 double current = 0;
 
 //global timers used to hold millisecond timers
@@ -37,7 +51,7 @@ unsigned long timeToDelay = 0;
 /* Function Signatures */
 void setupSPI();
 void writeBatteryErrors();
-bool checkBatteryErrors()
+bool checkBatteryErrors();
 int temperatureCheckLoop();
 
 
@@ -121,13 +135,14 @@ void loop() {
 	current = getCurrent(voltage);
 
 	//send current through serial
-	serial.print('Voltage: ');
-	serial.println(voltage);
-	serial.print('Current: ');
-	serial.println(current);
+	Serial.print('Voltage: ');
+	Serial.println(voltage);
+	Serial.print('Current: ');
+	Serial.println(current);
 	//send current through CAN packet
 
 //serial.print
 
 	delayLoop();				// wait for next loop
 }
+
