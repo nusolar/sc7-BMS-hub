@@ -64,10 +64,10 @@ void setupSPI()
 	SPI.begin(ARDUINO_TEMP_PIN);
 	// Set the clock divider on that pin to ARDUINO_SYSTEM_CLOCK_DIVIDER 
 	SPI.setClockDivider(ARDUINO_TEMP_PIN, 21);									// 21 clock divider. Arduino Due runs at 84 MHz, 84/21 = 4 Mhz. ADC runs 0.1 Mhz min, 4.8 Mhz max
-    // Set order for bits to be read
-    SPI.setBitOrder(MSBFIRST);
-    // Set data mode
-    SPI.setDataMode(SPI_MODE0);
+        // Set order for bits to be read
+        SPI.setBitOrder(ARDUINO_TEMP_PIN, MSBFIRST);
+        // Set data mode
+        SPI.setDataMode(ARDUINO_TEMP_PIN, SPI_MODE0);
 
 	// Set up serial output with 9600 baud rate
 	Serial.begin(9600);		
@@ -79,10 +79,7 @@ void setupSPI()
 double getVoltage(int selectPin)
 {
 	SPI.transfer(pinArray[selectPin], ADC_SPI_PREFIX, SPI_CONTINUE);				// send spi request
-	SPI.transfer(pinArray[selectPin], 0x00, SPI_CONTINUE);							// send 4 bytes full of zeros
-	SPI.transfer(pinArray[selectPin], 0x00, SPI_CONTINUE);
-	SPI.transfer(pinArray[selectPin], 0x00, SPI_CONTINUE);
-	SPI.transfer(pinArray[selectPin], 0x00, SPI_CONTINUE);
+	SPI.transfer(pinArray[selectPin], 0x00, SPI_CONTINUE);							// send 1 bytes full of zeros
 	voltageFirstByte = SPI.transfer(pinArray[selectPin], 0x00, SPI_CONTINUE);				// store into voltage
 	voltageSecondByte = SPI.transfer(pinArray[selectPin], 0x00, SPI_LAST);
 
