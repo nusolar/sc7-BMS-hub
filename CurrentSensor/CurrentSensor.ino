@@ -20,29 +20,48 @@
  */
 
 #include <SPI.h>
+#include "sc7-can-libinclude.h"
 
 
 /*
  *  GLOBAL VARIABLES       *************************************
  */
-int numOfPins = 1;						// number of pins to be checking
-int pinArray[1] = {4};		                        // array containing pin numbers
-int selectPin = 0;						// pin to be looked at
+int numOfPins 		= 1;						// number of pins to be checking
+int pinArray[1] 	= {4};		                // array containing pin numbers
+int selectPin 		= 0;						// pin to be looked at
+const byte CS_PIN 	= 4;
+const byte INT_PIN 	= 5;
 
 //global, holds information from the ADC
-int minVoltage = -12;
-int maxVoltage = 12;
-int bitNum = 14;
-unsigned int voltageFirstByte = 0;
-unsigned int voltageSecondByte = 0;
-unsigned int voltage = 0;
-double current = 0;
+int minVoltage 						= -12;
+int maxVoltage 						= 12;
+int bitNum 							= 14;
+unsigned int voltageFirstByte 		= 0;
+unsigned int voltageSecondByte 		= 0;
+unsigned int voltage 				= 0;
+double current 						= 0;
 
 //global timers used to hold millisecond timers
 unsigned long timeOfLastTemperatureCheck = 0;
-unsigned long timeNow = 0;
-unsigned long timeSinceCheck = 0;
-unsigned long timeToDelay = 0;
+unsigned long timeNow 				     = 0;
+unsigned long timeSinceCheck 		     = 0;
+unsigned long timeToDelay 				 = 0;
+
+//can controller parameters
+const uint16_t BAUD_RATE = 1000;
+const byte     FREQ      = 16;
+const uint16_t RXM0      = MASK_NONE;
+const uint16_t RXM1      = MASK_NONE;
+const uint16_t RXF0      = MASK_NONE;
+const uint16_t RXF1      = MASK_NONE;
+const uint16_t RXF2      = MASK_NONE;
+const uint16_t RXF3      = MASK_NONE;
+const uint16_t RXF4      = MASK_NONE;
+const uint16_t RXF5      = MASK_NONE;
+byte 		   CANErrors = 0
+
+//can controller
+CAN_IO CanControl(CS_PIN, INTERRUPT_PIN, BAUD_RATE, FREQ);
 
 /*
  *  HELPER FUNCTIONS       *************************************
@@ -64,13 +83,19 @@ void setupSPI()
 	SPI.begin(ARDUINO_TEMP_PIN);
 	// Set the clock divider on that pin to ARDUINO_SYSTEM_CLOCK_DIVIDER 
 	SPI.setClockDivider(ARDUINO_TEMP_PIN, 21);									// 21 clock divider. Arduino Due runs at 84 MHz, 84/21 = 4 Mhz. ADC runs 0.1 Mhz min, 4.8 Mhz max
-        // Set order for bits to be read
-        SPI.setBitOrder(ARDUINO_TEMP_PIN, MSBFIRST);
-        // Set data mode
-        SPI.setDataMode(ARDUINO_TEMP_PIN, SPI_MODE0);
+    // Set order for bits to be read
+    SPI.setBitOrder(ARDUINO_TEMP_PIN, MSBFIRST);
+    // Set data mode
+    SPI.setDataMode(ARDUINO_TEMP_PIN, SPI_MODE0);
 
 	// Set up serial output with 9600 baud rate
-	Serial.begin(9600);		
+	Serial.begin(9600);
+
+	// Initialize CAN
+	CANFilterOpt filters;
+  	filters.setRB0(RXM0, RXF0, RXF1);
+  	filters.setRB1(RXM1, RXF2, RXF3, RXF4, RXF5);
+  	CanControl.Setup(filters, &CANErrors);		
 }
 
 /*
@@ -118,6 +143,11 @@ void delayLoop()
 	delay(timeToDelay);
 }
 
+inline void sendCAN()
+{
+	CanControl.Send(BMShub_VoltageCurrent(0,current),TXB0);
+}
+
 /*
  *  MAIN FUNCTIONS       *************************************
  */
@@ -137,6 +167,7 @@ void loop() {
 	Serial.print('Current: ');
 	Serial.println(current);
 	//send current through CAN packet
+	sendCAN();
 
 //serial.print
 
