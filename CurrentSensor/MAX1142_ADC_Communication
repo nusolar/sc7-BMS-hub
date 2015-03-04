@@ -1,5 +1,4 @@
 /* Begin battery and temperature constants */
-
 #define NUM_BATTERIES                			32
 #define WAIT_TIME_MILLISECONDS				1000ul
 #define BATTERY_TEMP_STATUS_OVERHEAT 			true
