@@ -75,7 +75,7 @@ CAN_IO CanControl(CAN_CS_PIN, CAN_INT_PIN, BAUD_RATE, FREQ);
 
 /* Function Signatures */
 void   setupSPI();
-void  setupCAN();
+void   setupCAN();
 void   writeBatteryErrors();
 bool   checkBatteryErrors();
 int   temperatureCheckLoop();
@@ -85,7 +85,7 @@ void  waitForNextCycle();
 /*
  * Initializes SPI pins for communication.
  */
-void setupSPI()
+inline void setupSPI()
 {
   // Initialize the bus for the device on pin ARDUINO_TEMP_PIN
   SPI.begin(ARDUINO_TEMP_PIN);
@@ -97,13 +97,12 @@ void setupSPI()
   SPI.setDataMode(ARDUINO_TEMP_PIN,SPI_MODE0);
 }
 
-void setupCAN()
+inline void setupCAN()
 {
   // Initialize CAN
   CANFilterOpt filters;
-  filters
-  	.setRB0(RXM0, RXF0, RXF1)
-  	.setRB1(RXM1, RXF2, RXF3, RXF4, RXF5);
+  filters.setRB0(RXM0, RXF0, RXF1);
+  filters.setRB1(RXM1, RXF2, RXF3, RXF4, RXF5);
 
   CanControl.Setup(filters, &CANErrors);  
 }
