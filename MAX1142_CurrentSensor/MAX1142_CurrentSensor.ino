@@ -1,3 +1,13 @@
+/*  BMS Hub Current Sensor
+	Author (A-Z): Francis Chen, Alexander Martin, Wayne Xun
+	Date: Mar. 2015
+
+	This is the current sensor code for the BMS Hub. The Arduino communicates via
+        SPI to a MAX1142 ADC, which returns the voltage value from a current sensor.
+        This voltage corresponds to the current that is being sensed. This code supports
+        checking multiple batteries at numerious pins and is set to 1 by default.
+	*/
+
 /* Begin battery and temperature constants */
 
 #define NUM_BATTERIES                      32
@@ -55,14 +65,17 @@ Metro cycle_timer(WAIT_TIME_MILLISECONDS);
 // CAN controller parameters
 const uint16_t BAUD_RATE = 1000;
 const byte     FREQ       = 16;
-const uint16_t RXM0       = MASK_NONE;
+
+const uint16_t RXM0       = MASK_Sx00;
+const uint16_t RXF0       = 0;
+const uint16_t RXF1       = 0;
+
 const uint16_t RXM1       = MASK_NONE;
-const uint16_t RXF0       = MASK_NONE;
-const uint16_t RXF1       = MASK_NONE;
-const uint16_t RXF2       = MASK_NONE;
-const uint16_t RXF3       = MASK_NONE;
-const uint16_t RXF4       = MASK_NONE;
-const uint16_t RXF5       = MASK_NONE;
+const uint16_t RXF2       = 0;
+const uint16_t RXF3       = 0;
+const uint16_t RXF4       = 0;
+const uint16_t RXF5       = 0;
+
 uint16_t             CANErrors = 0;
 
 // CAN controller object
