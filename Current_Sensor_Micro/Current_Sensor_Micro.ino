@@ -52,8 +52,8 @@ int     bitNum     =     14;
 // Data variables
 unsigned int   voltageFirstByte  = 0;
 unsigned int   voltageSecondByte = 0;
-signed   int   voltage           = 0;
-double         current           = 0;
+signed   int   rawVoltage        = 0;
+float          current           = 0;
 
 // Global timers used to hold millisecond timers
 /*unsigned long timeOfLastTemperatureCheck = 0;
@@ -150,10 +150,10 @@ signed int getVoltage(int selectPin)
 /*
  * Converts voltage to current
  */
-inline double toCurrent(signed int voltage)
+inline double toCurrent(signed int v)
 {
   // with user defined voltage min, max, and bit positions
-  return (double)voltage * (maxVoltage - minVoltage)/pow(2,bitNum);
+  return (double)v * (maxVoltage - minVoltage)/pow(2,bitNum);
 }
 
 /* 
@@ -190,12 +190,12 @@ void setup() {
 void loop() {
   Serial.println("Sending SPI");
   selectPin = (selectPin + 1) % numOfPins; // Increment selected ADC pin
-  voltage = getVoltage(selectPin);
-  current = toCurrent(voltage);
+  rawVoltage = getVoltage(selectPin);
+  current = toCurrent(rawVoltage);
 
   //send current through serial
   Serial.print("Voltage: ");
-  Serial.println(voltage,BIN);
+  Serial.println(rawVoltage,BIN);
   Serial.print("Current: ");
   Serial.println(current);
 
